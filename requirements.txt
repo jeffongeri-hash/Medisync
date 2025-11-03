@@ -1,0 +1,42 @@
+# HIPAA-Compliant EHR Transfer System - Dependencies
+
+# Core cryptography for data encryption
+cryptography==41.0.7
+
+# Web framework for REST API
+flask==3.0.0
+flask-cors==4.0.0
+
+# HTTP requests (for OAuth and API calls)
+requests==2.31.0
+
+# Environment variable management
+python-dotenv==1.0.0
+
+# Data validation
+pydantic==2.5.3
+
+# JSON Web Token handling (for OAuth)
+PyJWT==2.8.0
+
+# Date/time handling
+python-dateutil==2.8.2
+
+# Testing frameworks
+pytest==7.4.3
+pytest-cov==4.1.0
+
+# Code quality
+black==23.12.1
+flake8==7.0.0
+mypy==1.8.0
+
+# Development server
+gunicorn==21.2.0
+
+# Database (optional for production)
+# psycopg2-binary==2.9.9  # PostgreSQL
+# pymongo==4.6.1  # MongoDB
+
+# Additional security utilities
+bcrypt==4.1.2

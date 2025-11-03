@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HIPAA-Compliant EHR Transfer System - Medisync</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <i class="fas fa-shield-alt"></i>
+                <h1>Medisync EHR Transfer</h1>
+            </div>
+            <nav class="nav">
+                <a href="#dashboard" class="nav-link active" onclick="showSection('dashboard')">
+                    <i class="fas fa-home"></i> Dashboard
+                </a>
+                <a href="#transfer" class="nav-link" onclick="showSection('transfer')">
+                    <i class="fas fa-exchange-alt"></i> New Transfer
+                </a>
+                <a href="#audit" class="nav-link" onclick="showSection('audit')">
+                    <i class="fas fa-file-alt"></i> Audit Logs
+                </a>
+                <a href="#patients" class="nav-link" onclick="showSection('patients')">
+                    <i class="fas fa-users"></i> Patients
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="section active">
+                <div class="section-header">
+                    <h2><i class="fas fa-chart-line"></i> Dashboard</h2>
+                    <p>HIPAA-compliant electronic health record transfer system</p>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #4CAF50;">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="stat-successful">0</h3>
+                            <p>Successful Transfers</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #2196F3;">
+                            <i class="fas fa-exchange-alt"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="stat-total">0</h3>
+                            <p>Total Transfers</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #FF9800;">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="stat-patients">0</h3>
+                            <p>Registered Patients</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #9C27B0;">
+                            <i class="fas fa-hospital"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="stat-systems">5</h3>
+                            <p>EHR Systems Connected</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <div class="info-card">
+                        <h3><i class="fas fa-shield-alt"></i> Security Features</h3>
+                        <ul>
+                            <li><i class="fas fa-check"></i> OAuth 2.0 Authentication</li>
+                            <li><i class="fas fa-check"></i> AES-128 Encryption (Fernet)</li>
+                            <li><i class="fas fa-check"></i> SHA-256 Data Integrity</li>
+                            <li><i class="fas fa-check"></i> TLS/HTTPS Transmission</li>
+                            <li><i class="fas fa-check"></i> Comprehensive Audit Logging</li>
+                            <li><i class="fas fa-check"></i> Patient Consent Verification</li>
+                        </ul>
+                    </div>
+
+                    <div class="info-card">
+                        <h3><i class="fas fa-balance-scale"></i> HIPAA Compliance</h3>
+                        <ul>
+                            <li><i class="fas fa-check"></i> Data Minimization Principle</li>
+                            <li><i class="fas fa-check"></i> Access Control & Authorization</li>
+                            <li><i class="fas fa-check"></i> Audit Trail Requirements</li>
+                            <li><i class="fas fa-check"></i> Data Integrity Validation</li>
+                            <li><i class="fas fa-check"></i> Secure Transmission</li>
+                            <li><i class="fas fa-check"></i> Patient Rights Protection</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Transfer Section -->
+            <section id="transfer" class="section">
+                <div class="section-header">
+                    <h2><i class="fas fa-exchange-alt"></i> Initiate Secure Transfer</h2>
+                    <p>Transfer patient data between EHR systems securely</p>
+                </div>
+
+                <div class="transfer-form">
+                    <form id="transferForm">
+                        <div class="form-group">
+                            <label for="patientId">
+                                <i class="fas fa-user"></i> Patient ID *
+                            </label>
+                            <select id="patientId" required>
+                                <option value="">Select Patient</option>
+                            </select>
+                        </div>
+
+                        <div class="consent-status" id="consentStatus"></div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="sourceSystem">
+                                    <i class="fas fa-hospital"></i> Source EHR System *
+                                </label>
+                                <select id="sourceSystem" required>
+                                    <option value="">Select Source</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="destinationSystem">
+                                    <i class="fas fa-hospital"></i> Destination EHR System *
+                                </label>
+                                <select id="destinationSystem" required>
+                                    <option value="">Select Destination</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="userId">
+                                <i class="fas fa-user-md"></i> Requesting User ID *
+                            </label>
+                            <input type="text" id="userId" placeholder="e.g., Dr.Smith@hospital.org" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                <i class="fas fa-database"></i> Data Elements to Transfer *
+                            </label>
+                            <div class="checkbox-grid" id="dataElements">
+                                <!-- Will be populated by JavaScript -->
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" onclick="resetForm()">
+                                <i class="fas fa-undo"></i> Reset
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane"></i> Initiate Transfer
+                            </button>
+                        </div>
+                    </form>
+
+                    <div id="transferResult" class="result-box" style="display: none;"></div>
+                </div>
+            </section>
+
+            <!-- Audit Logs Section -->
+            <section id="audit" class="section">
+                <div class="section-header">
+                    <h2><i class="fas fa-file-alt"></i> Audit Logs</h2>
+                    <p>Comprehensive audit trail for HIPAA compliance</p>
+                </div>
+
+                <div class="audit-controls">
+                    <button class="btn btn-primary" onclick="loadAuditLogs()">
+                        <i class="fas fa-sync-alt"></i> Refresh Logs
+                    </button>
+                </div>
+
+                <div class="audit-logs" id="auditLogs">
+                    <div class="loading">Loading audit logs...</div>
+                </div>
+            </section>
+
+            <!-- Patients Section -->
+            <section id="patients" class="section">
+                <div class="section-header">
+                    <h2><i class="fas fa-users"></i> Patient Consent Management</h2>
+                    <p>View and manage patient consent records</p>
+                </div>
+
+                <div class="patients-grid" id="patientsGrid">
+                    <div class="loading">Loading patients...</div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Medisync - HIPAA-Compliant EHR Transfer System</p>
+            <p>
+                <i class="fas fa-shield-alt"></i> Secure &bull;
+                <i class="fas fa-lock"></i> Encrypted &bull;
+                <i class="fas fa-check-circle"></i> HIPAA Compliant
+            </p>
+        </div>
+    </footer>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+        <div class="spinner"></div>
+        <p>Processing secure transfer...</p>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
