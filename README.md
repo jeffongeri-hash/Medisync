@@ -18,7 +18,29 @@ Medisync showcases how patient medical data can be securely transferred between 
 
 ## 🚀 Quick Start
 
-### Python Backend
+### Option 1: Epic FHIR Sandbox (Real API Integration)
+
+**NEW! Connect to Epic's actual FHIR sandbox and retrieve real patient data:**
+
+```bash
+# Install dependencies
+pip install -r requirements.txt
+
+# Run the Epic FHIR client
+python epic_fhir_client.py
+```
+
+This connects to Epic's public sandbox and retrieves:
+- Patient demographics (name, DOB, gender)
+- Vital signs (blood pressure, weight, temperature)
+- Active medications with dosages
+- Medical conditions/diagnoses
+
+**See [EPIC_SANDBOX_GUIDE.md](EPIC_SANDBOX_GUIDE.md) for detailed instructions.**
+
+---
+
+### Option 2: Python Backend (Simulation)
 
 ```bash
 # Install dependencies
@@ -28,7 +50,9 @@ pip install -r requirements.txt
 python hipaa_compliant_ehr_transfer.py
 ```
 
-### Web Application
+---
+
+### Option 3: Web Application
 
 Simply open `ehr_transfer_web_app.html` in your web browser:
 
@@ -101,9 +125,12 @@ The system includes realistic mock patient data:
 
 ```
 Medisync/
-├── hipaa_compliant_ehr_transfer.py    # Python backend
+├── epic_fhir_client.py                # Epic FHIR sandbox client (NEW!)
+├── hipaa_compliant_ehr_transfer.py    # Python backend simulation
 ├── ehr_transfer_web_app.html          # Web interface
 ├── requirements.txt                   # Python dependencies
+├── EPIC_SANDBOX_GUIDE.md              # Epic API integration guide (NEW!)
+├── SETUP_GUIDE.md                     # Step-by-step setup instructions
 ├── PROJECT_OVERVIEW.md                # Detailed documentation
 ├── README.md                          # This file
 └── ehr_audit.log                      # Generated audit trail
