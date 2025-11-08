@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HIPAA-Compliant EHR Transfer System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 968px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .form-group select,
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        .form-group select:focus,
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .checkbox-item label {
+            cursor: pointer;
+            margin: 0;
+            font-weight: normal;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.1em;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .status-container {
+            margin-top: 20px;
+        }
+
+        .status-step {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #e0e0e0;
+            transition: all 0.3s;
+        }
+
+        .status-step.active {
+            background: #e3f2fd;
+            border-left-color: #2196F3;
+        }
+
+        .status-step.completed {
+            background: #e8f5e9;
+            border-left-color: #4CAF50;
+        }
+
+        .status-icon {
+            font-size: 1.5em;
+            margin-right: 15px;
+            width: 30px;
+        }
+
+        .status-text {
+            flex: 1;
+            font-weight: 500;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .results-container {
+            display: none;
+        }
+
+        .results-container.visible {
+            display: block;
+        }
+
+        .patient-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+        }
+
+        .patient-card h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .data-item {
+            display: flex;
+            padding: 8px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .data-item:last-child {
+            border-bottom: none;
+        }
+
+        .data-label {
+            font-weight: 600;
+            width: 150px;
+            color: #555;
+        }
+
+        .data-value {
+            flex: 1;
+            color: #333;
+        }
+
+        .medical-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .medical-list li {
+            padding: 10px;
+            background: white;
+            margin-bottom: 8px;
+            border-radius: 5px;
+            border-left: 3px solid #667eea;
+        }
+
+        .audit-log {
+            max-height: 300px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        .audit-entry {
+            padding: 5px 0;
+            border-bottom: 1px solid #e0e0e0;
+            color: #333;
+        }
+
+        .audit-entry:last-child {
+            border-bottom: none;
+        }
+
+        .timestamp {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .encrypted-badge {
+            display: inline-block;
+            background: #ff9800;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .success-message {
+            background: #4CAF50;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+            display: none;
+        }
+
+        .success-message.visible {
+            display: block;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🏥 HIPAA-Compliant EHR Transfer System</h1>
+            <p>Secure Electronic Health Record Data Transfer with Full Compliance</p>
+        </div>
+
+        <!-- Main Grid -->
+        <div class="main-grid">
+            <!-- Configuration Panel -->
+            <div class="card">
+                <h2>⚙️ System Configuration</h2>
+
+                <div class="form-group">
+                    <label for="sourceEHR">Source EHR System</label>
+                    <select id="sourceEHR">
+                        <option value="Epic Systems">Epic Systems</option>
+                        <option value="Cerner PowerChart">Cerner PowerChart</option>
+                        <option value="Allscripts">Allscripts</option>
+                        <option value="MEDITECH">MEDITECH</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="destinationEHR">Destination EHR System</label>
+                    <select id="destinationEHR">
+                        <option value="Cerner PowerChart">Cerner PowerChart</option>
+                        <option value="Epic Systems">Epic Systems</option>
+                        <option value="Allscripts">Allscripts</option>
+                        <option value="MEDITECH">MEDITECH</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="patientId">Patient ID</label>
+                    <input type="text" id="patientId" value="patient-12345" placeholder="Enter patient ID">
+                </div>
+
+                <div class="form-group">
+                    <label>Data Elements to Transfer</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="chk_demographics" checked>
+                            <label for="chk_demographics">Demographics</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="chk_medical" checked>
+                            <label for="chk_medical">Medical History</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="chk_vitals" checked>
+                            <label for="chk_vitals">Vital Signs</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="chk_medications" checked>
+                            <label for="chk_medications">Medications</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="chk_surgical">
+                            <label for="chk_surgical">Surgical History</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="chk_allergies">
+                            <label for="chk_allergies">Allergies</label>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" id="startTransferBtn" onclick="startTransfer()">
+                    🚀 Start Secure Transfer
+                </button>
+                <button class="btn btn-secondary" onclick="resetSystem()">
+                    🔄 Reset
+                </button>
+            </div>
+
+            <!-- Status Panel -->
+            <div class="card">
+                <h2>📊 Transfer Status</h2>
+
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressBar">0%</div>
+                </div>
+
+                <div class="status-container">
+                    <div class="status-step" id="step1">
+                        <div class="status-icon">⏳</div>
+                        <div class="status-text">Step 1: OAuth Authentication</div>
+                    </div>
+                    <div class="status-step" id="step2">
+                        <div class="status-icon">⏳</div>
+                        <div class="status-text">Step 2: Patient Consent Verification</div>
+                    </div>
+                    <div class="status-step" id="step3">
+                        <div class="status-icon">⏳</div>
+                        <div class="status-text">Step 3: Data Retrieval</div>
+                    </div>
+                    <div class="status-step" id="step4">
+                        <div class="status-icon">⏳</div>
+                        <div class="status-text">Step 4: Security Validation</div>
+                    </div>
+                    <div class="status-step" id="step5">
+                        <div class="status-icon">⏳</div>
+                        <div class="status-text">Step 5: Data Transmission</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Panel -->
+            <div class="card full-width results-container" id="resultsPanel">
+                <div class="success-message" id="successMessage">
+                    ✅ Transfer Completed Successfully!
+                </div>
+
+                <h2>📋 Transferred Patient Data</h2>
+
+                <div id="patientDataDisplay"></div>
+            </div>
+
+            <!-- Audit Log -->
+            <div class="card full-width">
+                <h2>📝 Audit Log</h2>
+                <div class="audit-log" id="auditLog">
+                    <div class="audit-entry">
+                        <span class="timestamp">[System Ready]</span> Awaiting transfer initiation...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mock patient data
+        const mockPatientData = {
+            patient: {
+                id: 'patient-12345',
+                name: 'John Doe',
+                gender: 'Male',
+                birthDate: '1980-05-15',
+                mrn: '***ENCRYPTED***',
+                contact: {
+                    phone: '***ENCRYPTED***',
+                    address: '***ENCRYPTED***',
+                    city: 'Springfield',
+                    state: 'IL',
+                    zip: '***ENCRYPTED***'
+                }
+            },
+            medical_history: [
+                {
+                    condition: 'Type 2 Diabetes Mellitus',
+                    code: 'E11',
+                    onset_date: '2015-03-20',
+                    status: 'active'
+                },
+                {
+                    condition: 'Hypertension',
+                    code: 'I10',
+                    onset_date: '2016-07-10',
+                    status: 'active'
+                },
+                {
+                    condition: 'Former smoker',
+                    code: 'Z87.891',
+                    onset_date: '2010-01-01',
+                    status: 'resolved'
+                }
+            ],
+            vital_signs: [
+                {
+                    type: 'Blood Pressure',
+                    value: '128/82 mmHg',
+                    date: '2024-10-15'
+                },
+                {
+                    type: 'Weight',
+                    value: '185 lbs',
+                    date: '2024-10-15'
+                },
+                {
+                    type: 'Blood Glucose',
+                    value: '110 mg/dL',
+                    date: '2024-10-15'
+                }
+            ],
+            medications: [
+                {
+                    name: 'Metformin',
+                    dosage: '500mg',
+                    frequency: 'twice daily',
+                    route: 'oral',
+                    start_date: '2015-03-25'
+                },
+                {
+                    name: 'Lisinopril',
+                    dosage: '10mg',
+                    frequency: 'once daily',
+                    route: 'oral',
+                    start_date: '2016-07-15'
+                },
+                {
+                    name: 'Atorvastatin',
+                    dosage: '20mg',
+                    frequency: 'once daily at bedtime',
+                    route: 'oral',
+                    start_date: '2017-02-10'
+                }
+            ],
+            surgical_history: [
+                {
+                    procedure: 'Appendectomy',
+                    date: '2005-08-12',
+                    surgeon: 'Dr. Smith'
+                },
+                {
+                    procedure: 'Wisdom teeth extraction',
+                    date: '1998-06-20',
+                    surgeon: 'Dr. Johnson'
+                }
+            ]
+        };
+
+        let transferInProgress = false;
+
+        function addAuditEntry(message) {
+            const auditLog = document.getElementById('auditLog');
+            const timestamp = new Date().toLocaleTimeString();
+            const entry = document.createElement('div');
+            entry.className = 'audit-entry';
+            entry.innerHTML = `<span class="timestamp">[${timestamp}]</span> ${message}`;
+            auditLog.appendChild(entry);
+            auditLog.scrollTop = auditLog.scrollHeight;
+        }
+
+        function updateProgress(step, percentage) {
+            const progressBar = document.getElementById('progressBar');
+            progressBar.style.width = percentage + '%';
+            progressBar.textContent = percentage + '%';
+        }
+
+        function updateStepStatus(stepNumber, status) {
+            const step = document.getElementById('step' + stepNumber);
+            const icon = step.querySelector('.status-icon');
+
+            if (status === 'active') {
+                step.className = 'status-step active';
+                icon.textContent = '🔄';
+            } else if (status === 'completed') {
+                step.className = 'status-step completed';
+                icon.textContent = '✅';
+            }
+        }
+
+        async function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        async function startTransfer() {
+            if (transferInProgress) return;
+
+            transferInProgress = true;
+            document.getElementById('startTransferBtn').disabled = true;
+            document.getElementById('resultsPanel').classList.remove('visible');
+            document.getElementById('successMessage').classList.remove('visible');
+
+            const sourceEHR = document.getElementById('sourceEHR').value;
+            const destinationEHR = document.getElementById('destinationEHR').value;
+            const patientId = document.getElementById('patientId').value;
+
+            // Reset steps
+            for (let i = 1; i <= 5; i++) {
+                document.getElementById('step' + i).className = 'status-step';
+                document.getElementById('step' + i).querySelector('.status-icon').textContent = '⏳';
+            }
+
+            addAuditEntry(`Transfer initiated: ${sourceEHR} → ${destinationEHR}`);
+            addAuditEntry(`Patient ID: ${patientId}`);
+
+            try {
+                // Step 1: OAuth Authentication
+                updateStepStatus(1, 'active');
+                addAuditEntry('Authenticating with source EHR...');
+                await sleep(1000);
+                addAuditEntry(`✓ OAuth token obtained from ${sourceEHR}`);
+                await sleep(500);
+                addAuditEntry('Authenticating with destination EHR...');
+                await sleep(1000);
+                addAuditEntry(`✓ OAuth token obtained from ${destinationEHR}`);
+                updateStepStatus(1, 'completed');
+                updateProgress(1, 20);
+
+                // Step 2: Consent Verification
+                updateStepStatus(2, 'active');
+                addAuditEntry('Verifying patient consent...');
+                await sleep(1000);
+                addAuditEntry('✓ Patient consent verified - Active until 2025-01-15');
+                updateStepStatus(2, 'completed');
+                updateProgress(2, 40);
+
+                // Step 3: Data Retrieval
+                updateStepStatus(3, 'active');
+                addAuditEntry(`Retrieving patient data from ${sourceEHR}...`);
+                await sleep(1500);
+
+                const selectedElements = getSelectedDataElements();
+                addAuditEntry(`✓ Retrieved ${selectedElements.length} data elements`);
+                addAuditEntry(`Data elements: ${selectedElements.join(', ')}`);
+                updateStepStatus(3, 'completed');
+                updateProgress(3, 60);
+
+                // Step 4: Security Validation
+                updateStepStatus(4, 'active');
+                addAuditEntry('Encrypting sensitive PHI fields...');
+                await sleep(1000);
+                addAuditEntry('✓ Encryption complete (AES-256)');
+                await sleep(500);
+                addAuditEntry('Generating data integrity checksum...');
+                const checksum = generateMockChecksum();
+                await sleep(800);
+                addAuditEntry(`✓ SHA-256 Checksum: ${checksum}`);
+                updateStepStatus(4, 'completed');
+                updateProgress(4, 80);
+
+                // Step 5: Data Transmission
+                updateStepStatus(5, 'active');
+                addAuditEntry(`Transmitting data to ${destinationEHR} via HTTPS...`);
+                await sleep(1500);
+                const transmissionId = generateMockTransmissionId();
+                addAuditEntry(`✓ Transmission successful - ID: ${transmissionId}`);
+                addAuditEntry('Verifying data integrity at destination...');
+                await sleep(800);
+                addAuditEntry('✓ Integrity verification passed');
+                updateStepStatus(5, 'completed');
+                updateProgress(5, 100);
+
+                // Show success
+                addAuditEntry('🎉 Transfer completed successfully!');
+                document.getElementById('successMessage').classList.add('visible');
+
+                // Display results
+                displayPatientData(selectedElements);
+                document.getElementById('resultsPanel').classList.add('visible');
+
+            } catch (error) {
+                addAuditEntry(`❌ Error: ${error.message}`);
+            } finally {
+                transferInProgress = false;
+                document.getElementById('startTransferBtn').disabled = false;
+            }
+        }
+
+        function getSelectedDataElements() {
+            const elements = [];
+            const mapping = {
+                'chk_demographics': 'patient',
+                'chk_medical': 'medical_history',
+                'chk_vitals': 'vital_signs',
+                'chk_medications': 'medications',
+                'chk_surgical': 'surgical_history'
+            };
+
+            for (const [checkboxId, elementName] of Object.entries(mapping)) {
+                if (document.getElementById(checkboxId).checked) {
+                    elements.push(elementName);
+                }
+            }
+
+            return elements;
+        }
+
+        function displayPatientData(selectedElements) {
+            const display = document.getElementById('patientDataDisplay');
+            let html = '';
+
+            if (selectedElements.includes('patient')) {
+                const patient = mockPatientData.patient;
+                html += `
+                    <div class="patient-card">
+                        <h3>👤 Patient Demographics</h3>
+                        <div class="data-item">
+                            <div class="data-label">Name:</div>
+                            <div class="data-value">${patient.name}</div>
+                        </div>
+                        <div class="data-item">
+                            <div class="data-label">Gender:</div>
+                            <div class="data-value">${patient.gender}</div>
+                        </div>
+                        <div class="data-item">
+                            <div class="data-label">Date of Birth:</div>
+                            <div class="data-value">${patient.birthDate}</div>
+                        </div>
+                        <div class="data-item">
+                            <div class="data-label">MRN:</div>
+                            <div class="data-value">${patient.mrn}<span class="encrypted-badge">ENCRYPTED</span></div>
+                        </div>
+                        <div class="data-item">
+                            <div class="data-label">Phone:</div>
+                            <div class="data-value">${patient.contact.phone}<span class="encrypted-badge">ENCRYPTED</span></div>
+                        </div>
+                        <div class="data-item">
+                            <div class="data-label">City, State:</div>
+                            <div class="data-value">${patient.contact.city}, ${patient.contact.state}</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (selectedElements.includes('medical_history')) {
+                html += `
+                    <div class="patient-card">
+                        <h3>⚕️ Medical History</h3>
+                        <ul class="medical-list">
+                            ${mockPatientData.medical_history.map(item => `
+                                <li>
+                                    <strong>${item.condition}</strong> (${item.code})<br>
+                                    Onset: ${item.onset_date} | Status: ${item.status}
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                `;
+            }
+
+            if (selectedElements.includes('vital_signs')) {
+                html += `
+                    <div class="patient-card">
+                        <h3>📈 Vital Signs</h3>
+                        <ul class="medical-list">
+                            ${mockPatientData.vital_signs.map(item => `
+                                <li>
+                                    <strong>${item.type}:</strong> ${item.value} (${item.date})
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                `;
+            }
+
+            if (selectedElements.includes('medications')) {
+                html += `
+                    <div class="patient-card">
+                        <h3>💊 Current Medications</h3>
+                        <ul class="medical-list">
+                            ${mockPatientData.medications.map(item => `
+                                <li>
+                                    <strong>${item.name}</strong> ${item.dosage}<br>
+                                    ${item.frequency} (${item.route}) | Started: ${item.start_date}
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                `;
+            }
+
+            if (selectedElements.includes('surgical_history')) {
+                html += `
+                    <div class="patient-card">
+                        <h3>🔬 Surgical History</h3>
+                        <ul class="medical-list">
+                            ${mockPatientData.surgical_history.map(item => `
+                                <li>
+                                    <strong>${item.procedure}</strong><br>
+                                    Date: ${item.date} | Surgeon: ${item.surgeon}
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                `;
+            }
+
+            display.innerHTML = html;
+        }
+
+        function generateMockChecksum() {
+            return Array.from({length: 16}, () =>
+                Math.floor(Math.random() * 16).toString(16)
+            ).join('') + '...';
+        }
+
+        function generateMockTransmissionId() {
+            return 'TX-' + Array.from({length: 8}, () =>
+                Math.floor(Math.random() * 16).toString(16)
+            ).join('').toUpperCase();
+        }
+
+        function resetSystem() {
+            transferInProgress = false;
+            document.getElementById('startTransferBtn').disabled = false;
+            document.getElementById('resultsPanel').classList.remove('visible');
+            document.getElementById('successMessage').classList.remove('visible');
+
+            // Reset progress
+            updateProgress(0, 0);
+
+            // Reset steps
+            for (let i = 1; i <= 5; i++) {
+                document.getElementById('step' + i).className = 'status-step';
+                document.getElementById('step' + i).querySelector('.status-icon').textContent = '⏳';
+            }
+
+            // Clear audit log
+            document.getElementById('auditLog').innerHTML = `
+                <div class="audit-entry">
+                    <span class="timestamp">[System Ready]</span> Awaiting transfer initiation...
+                </div>
+            `;
+        }
+
+        // Prevent selecting same system for source and destination
+        document.getElementById('sourceEHR').addEventListener('change', function() {
+            const destSelect = document.getElementById('destinationEHR');
+            if (this.value === destSelect.value) {
+                const options = destSelect.querySelectorAll('option');
+                for (let option of options) {
+                    if (option.value !== this.value) {
+                        destSelect.value = option.value;
+                        break;
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
